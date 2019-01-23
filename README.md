@@ -9,3 +9,9 @@ This project uses:
 - MVVM / LiveData
 - Room Persistence Library
 - Dagger 2
+
+
+Reference:
+
+https://medium.com/android-dev-br/come%C3%A7ando-com-android-data-binding-d7719333eecc
+https://github.com/WellingtonCosta/android-databinding-playground
