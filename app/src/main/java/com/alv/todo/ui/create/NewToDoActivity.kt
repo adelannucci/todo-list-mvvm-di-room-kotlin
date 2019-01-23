@@ -13,6 +13,8 @@ import convalida.annotations.OnValidationSuccess
 import dagger.android.support.DaggerAppCompatActivity
 import javax.inject.Inject
 import com.alv.todo.databinding.ActivityNewToDoBinding
+import java.util.*
+
 
 class NewToDoActivity : DaggerAppCompatActivity() {
     private lateinit var binding: ActivityNewToDoBinding
@@ -30,7 +32,8 @@ class NewToDoActivity : DaggerAppCompatActivity() {
                 .get(NewToDoViewModel::class.java)
 
         binding.viewModel = viewModel
-        binding.toDo = ToDo(id = null, name = "", isComplete = false)
+        val date = Date().time
+        binding.toDo = ToDo(id = null, name = "", isComplete = false, dateCompleted = date, dateCreated = date)
         binding.setLifecycleOwner(this)
 
         setupToolbar()
@@ -41,11 +44,18 @@ class NewToDoActivity : DaggerAppCompatActivity() {
         observeHasError()
     }
 
+    override fun onDestroy() {
+        viewModel.dispose()
+        super.onDestroy()
+    }
+
     private fun setupToolbar() {
         setSupportActionBar(binding.includeToolbar?.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        binding.includeToolbar?.toolbar?.setNavigationOnClickListener { finish() }
+        binding.includeToolbar?.toolbar?.setNavigationOnClickListener {
+            viewModel.close()
+        }
     }
 
     @OnValidationSuccess

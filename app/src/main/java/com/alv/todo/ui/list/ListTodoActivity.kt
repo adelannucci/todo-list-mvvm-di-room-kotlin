@@ -21,6 +21,7 @@ import com.alv.todo.domain.ToDo
 import com.alv.todo.ui.Constants.DELETE_TODO
 import com.alv.todo.ui.Constants.UPDATE_TODO
 import com.alv.todo.ui.create.NewToDoActivity
+import java.util.*
 
 
 class ListTodoActivity : DaggerAppCompatActivity() {
@@ -95,6 +96,7 @@ class ListTodoActivity : DaggerAppCompatActivity() {
     private fun callbackUpdateToDoItem() {
         RxBus.subscribe(UPDATE_TODO, this, Consumer {
             val item: ToDo = it as ToDo
+            item.dateCompleted = Calendar.getInstance().timeInMillis
             viewModel.update(item)
         })
     }

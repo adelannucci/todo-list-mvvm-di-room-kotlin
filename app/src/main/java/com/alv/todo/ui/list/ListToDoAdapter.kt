@@ -8,6 +8,8 @@ import com.alv.todo.domain.ToDo
 import com.alv.todo.ui.Constants.DELETE_TODO
 import com.alv.todo.ui.Constants.UPDATE_TODO
 import com.alv.todo.ui.RxBus
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ListToDoAdapter(
         var todo: List<ToDo>
@@ -25,9 +27,11 @@ class ListToDoAdapter(
         binding?.executePendingBindings()
 
         holder.todoCheckBox.isChecked = todo[position].isComplete
+        holder.todoDate.text = formatDate(todo[position])
 
         holder.todoCheckBox.setOnCheckedChangeListener { view, isChecked ->
             todo[position].isComplete = isChecked
+            holder.todoDate.text = formatDate(todo[position])
             RxBus.publish(UPDATE_TODO, todo[position])
         }
 
@@ -36,6 +40,20 @@ class ListToDoAdapter(
             RxBus.publish(DELETE_TODO, item)
             return@setOnLongClickListener true
         }
+    }
+
+    private fun formatDate(toDo: ToDo): String {
+        val date: Date
+        val formatDate: String
+        val sdf = SimpleDateFormat("dd/MM/yyy")
+        if(toDo.isComplete) {
+            date = Date(toDo.dateCompleted)
+            formatDate = sdf.format(date)
+        } else {
+            date = Date(toDo.dateCreated)
+            formatDate = sdf.format(date)
+        }
+        return formatDate
     }
 
     override fun getItemCount() = todo.size

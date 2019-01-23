@@ -2,6 +2,7 @@ package com.alv.todo.ui.create
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.util.Log
 import com.alv.todo.data.room.ToDoDao
 import com.alv.todo.domain.ToDo
 import io.reactivex.Observable
@@ -23,9 +24,22 @@ class NewToDoViewModel @Inject constructor(
 
     val hasError: MutableLiveData<Boolean> = MutableLiveData()
 
-    fun save(item: ToDo) {
+    override fun onCleared() {
+        super.onCleared()
+        dispose()
+    }
+
+    fun dispose() {
+        if (!disposable.isDisposed) {
+            disposable.dispose()
+        }
+    }
+
+    fun close() {
         disposable = Observable
-                .fromCallable { toDoDao.insert(item) }
+                .fromCallable {
+                    Log.i("CLOSE", "CLOSE")
+                }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { isSaving.value = true }
@@ -36,11 +50,20 @@ class NewToDoViewModel @Inject constructor(
                 )
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        if(!disposable.isDisposed) {
-            disposable.dispose()
-        }
+    fun save(item: ToDo) {
+        disposable = Observable
+                .fromCallable {
+                    if(item != null)
+                        toDoDao.insert(item)
+                }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { isSaving.value = true }
+                .doAfterTerminate { isSaving.value = false }
+                .subscribe(
+                        { wasSaved.value = true },
+                        { hasError.value = true ; wasSaved.value = false }
+                )
     }
 
 }
