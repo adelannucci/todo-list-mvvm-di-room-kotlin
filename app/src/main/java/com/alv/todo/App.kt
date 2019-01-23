@@ -1,0 +1,14 @@
+package com.alv.todo
+
+import com.alv.todo.di.DaggerAppComponent
+import dagger.android.AndroidInjector
+import dagger.android.support.DaggerApplication
+
+
+class App : DaggerApplication() {
+
+    override fun applicationInjector(): AndroidInjector<out App> {
+        return DaggerAppComponent.builder().create(this)
+    }
+
+}
